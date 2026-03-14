@@ -35,11 +35,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     # --- Data Processing ---
     jq \
     bc \
-    # --- PDF ---
+    xmlstarlet \
+    # --- PDF / Documents ---
     poppler-utils \
+    pandoc \
     # --- Media ---
     ffmpeg \
     imagemagick \
+    # --- Archive ---
+    p7zip-full \
+    xz-utils \
+    # --- Search ---
+    ripgrep \
     # --- TLS / Certs ---
     ca-certificates \
     openssl \
@@ -54,8 +61,14 @@ RUN mkdir -p /home/node/.config/pip \
     && printf '[global]\nproxy = http://proxy:8888\n' > /home/node/.config/pip/pip.conf \
     && chown -R node:node /home/node/.config
 
-# Pre-installed Python packages (document manipulation + PDF parsing)
-RUN pip3 install --break-system-packages python-docx pymupdf
+# Pre-installed Python packages
+RUN pip3 install --break-system-packages \
+    python-docx \
+    pymupdf \
+    numpy \
+    pandas \
+    matplotlib \
+    requests
 
 # Make the 'openclaw' CLI command available system-wide
 # (the npm package declares bin: { openclaw: openclaw.mjs } but isn't globally linked)

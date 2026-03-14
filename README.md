@@ -323,7 +323,7 @@ The agent container has `no-new-privileges` and no `sudo` — packages can't be 
 docker compose build openclaw && docker compose up -d openclaw
 ```
 
-Pre-installed tools: curl, wget, ping, nmap, dig, traceroute, whois, netcat, git, python3, pip, jq, ffmpeg, imagemagick, nano, vim, and more. See `agent/Dockerfile` for the full list.
+Pre-installed tools: curl, wget, ping, nmap, dig, traceroute, whois, netcat, git, python3, pip, jq, pandoc, ripgrep, ffmpeg, imagemagick, 7z, nano, vim, and more. Python packages: numpy, pandas, matplotlib, requests, python-docx, pymupdf. See `agent/Dockerfile` for the full list.
 
 ### How to add a new whitelisted API
 
