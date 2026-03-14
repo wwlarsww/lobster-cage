@@ -38,6 +38,8 @@ Lobster Cage defends in two layers: **structural barriers** that are physically 
 | Agent bypasses proxy via subprocess | `http_proxy` / `https_proxy` env vars → all HTTP goes through Tinyproxy |
 | Someone uses the proxy from outside | Tinyproxy only allows `172.28.0.0/24` (Docker internal subnet) |
 | Agent changes its own DNS server | Docker `dns:` config is read-only; even if changed, no route to external DNS |
+| Agent writes malware to container FS | Infrastructure containers run `read_only: true`; agent container gets `tmpfs` for `/tmp` only |
+| Agent OOM-kills host services | Every container has a `mem_limit` (totalling ~2.5 GB) — Docker kills the container, not your Pi |
 
 ### ⚠️ Residual risk — mitigated by SOUL.md security rules + audit logging
 
@@ -59,7 +61,7 @@ These vectors are inherent to *any* system that gives an AI agent internet acces
 | Attack | Why it's not covered | Practical risk | Could be reduced by |
 |--------|---------------------|---------------|---------------------|
 | Timing side channels | Would need kernel-level isolation | Extremely low bandwidth — impractical | Not feasible in Docker |
-| Container escape (kernel exploit) | Standard Docker + `cap_drop: ALL` + `no-new-privileges` | Very hard without capabilities | Run Docker in rootless mode; use gVisor/Kata Containers |
+| Container escape (kernel exploit) | Standard Docker + `cap_drop: ALL` + `no-new-privileges` + `read_only` | Very hard without capabilities | Run Docker in rootless mode; use gVisor/Kata Containers |
 | Supply chain attack on OpenClaw image | We trust `ghcr.io/openclaw/openclaw:latest` | Upstream compromise — out of scope | Pin image to specific digest (`@sha256:...`) instead of `:latest` |
 | Credential theft inside container | API keys are env vars; compromised container reads them | Inherent to any Docker app that needs API keys | Use Docker secrets or an external vault (HashiCorp Vault, SOPS) |
 

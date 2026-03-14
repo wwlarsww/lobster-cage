@@ -3,6 +3,11 @@ services:
   proxy:
     image: ghcr.io/querateam/docker-tinyproxy:latest
     container_name: openclaw_proxy
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /run
+    mem_limit: 64m
     volumes:
       - ./outbound-proxy/tinyproxy.conf:/etc/tinyproxy/tinyproxy.conf:ro
       - ./outbound-proxy/whitelist.txt:/etc/tinyproxy/whitelist.txt:ro
@@ -16,6 +21,11 @@ services:
     image: searxng/searxng:latest
     container_name: openclaw_searxng
     restart: always
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /run
+    mem_limit: 256m
     volumes:
       - ./searxng/settings.yml:/etc/searxng/settings.yml:ro
       - ./searxng/limiter.toml:/etc/searxng/limiter.toml:ro
@@ -30,6 +40,10 @@ services:
     build: ./reader
     container_name: openclaw_reader
     restart: always
+    read_only: true
+    tmpfs:
+      - /tmp
+    mem_limit: 128m
     environment:
       - READER_PORT=3000
       - READER_TIMEOUT=15
@@ -42,6 +56,10 @@ services:
     image: alpine:3.19
     container_name: openclaw_dns
     restart: always
+    read_only: true
+    tmpfs:
+      - /tmp
+    mem_limit: 32m
     volumes:
       - ./dns/entrypoint.sh:/entrypoint.sh:ro
       - ./outbound-proxy/whitelist.txt:/etc/dns-whitelist.txt:ro
@@ -75,6 +93,9 @@ services:
       - NET_BIND_SERVICE
     security_opt:
       - no-new-privileges:true
+    mem_limit: 2g
+    tmpfs:
+      - /tmp
     environment:
       # Gateway (token auth – browser stores device token after first pairing)
       - OPENCLAW_GATEWAY_BIND=0.0.0.0
@@ -143,6 +164,13 @@ services:
     image: caddy:alpine
     container_name: openclaw_caddy
     restart: always
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /run
+      - /config/caddy
+      - /data/caddy
+    mem_limit: 64m
     ports:
       - "${OPENCLAW_PORT:-18789}:${OPENCLAW_PORT:-18789}"
     env_file:
