@@ -2,13 +2,8 @@ FROM ghcr.io/openclaw/openclaw:latest
 
 USER root
 
-# Passwordless sudo for the node user (agent can install packages at runtime)
-RUN apt-get update && apt-get install -y --no-install-recommends sudo \
-    && echo 'node ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/node \
-    && chmod 0440 /etc/sudoers.d/node
-
-# CLI-Toolbox: Network, System, Dev, Data Processing
-RUN apt-get install -y --no-install-recommends \
+# CLI-Toolbox: Network, System, Dev, Data Processing, Media
+RUN apt-get update && apt-get install -y --no-install-recommends \
     # --- Network ---
     curl \
     wget \
@@ -16,6 +11,8 @@ RUN apt-get install -y --no-install-recommends \
     dnsutils \
     netcat-openbsd \
     traceroute \
+    nmap \
+    whois \
     openssh-client \
     rsync \
     # --- System ---
@@ -40,12 +37,15 @@ RUN apt-get install -y --no-install-recommends \
     bc \
     # --- PDF ---
     poppler-utils \
+    # --- Media ---
+    ffmpeg \
+    imagemagick \
     # --- TLS / Certs ---
     ca-certificates \
     openssl \
     && rm -rf /var/lib/apt/lists/*
 
-# Persist APT proxy so that sudo apt-get inside the agent uses the outbound proxy
+# Persist APT proxy so runtime builds inside the container use the outbound proxy
 RUN echo 'Acquire::http::Proxy "http://proxy:8888";' > /etc/apt/apt.conf.d/99proxy \
     && echo 'Acquire::https::Proxy "http://proxy:8888";' >> /etc/apt/apt.conf.d/99proxy
 

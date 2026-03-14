@@ -310,6 +310,21 @@ Gives the agent smart home control via the HA REST API.
 
 ## Extending the cage
 
+### How to add packages to the agent
+
+The agent container has `no-new-privileges` and no `sudo` — packages can't be installed at runtime. Instead, add them to `agent/Dockerfile` and rebuild:
+
+```dockerfile
+# In agent/Dockerfile, add to the apt-get install list:
+    mypackage \
+```
+
+```bash
+docker compose build openclaw && docker compose up -d openclaw
+```
+
+Pre-installed tools: curl, wget, ping, nmap, dig, traceroute, whois, netcat, git, python3, pip, jq, ffmpeg, imagemagick, nano, vim, and more. See `agent/Dockerfile` for the full list.
+
 ### How to add a new whitelisted API
 
 ```bash
@@ -402,6 +417,7 @@ lobster-cage/
 ├── caddy/
 │   └── Caddyfile                       # HTTPS reverse proxy config
 ├── dns/
+│   ├── Dockerfile                      # Alpine 3.19 + dnsmasq
 │   └── entrypoint.sh                   # DNS whitelisting (reads whitelist.txt)
 ├── outbound-proxy/
 │   ├── tinyproxy.conf                  # Proxy settings
@@ -441,7 +457,7 @@ workspace/                      # Agent workspace (incl. your SOUL.md)
 | DNS errors | Domain not whitelisted | Check `whitelist.txt`, `docker compose restart dns` |
 | TLS errors to LAN host | Self-signed cert not trusted | Add hostname to `TLS_SKIP_VERIFY_HOSTS` |
 | `web_search` returns nothing | SearXNG API format changed | Check SearXNG version, `docker compose pull searxng` |
-| Agent can't install packages | `pypi.org` or `deb.debian.org` blocked | Should be in whitelist by default — check DNS |
+| Agent can't install packages | `no-new-privileges` blocks `sudo` | Add the package to `agent/Dockerfile` and rebuild |
 
 ---
 
